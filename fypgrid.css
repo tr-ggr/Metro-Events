@@ -1,0 +1,16 @@
+.main-screen {
+  display: grid;
+  grid-template-columns: 5rem auto;
+  grid-template-rows: 100dvh;
+  grid-template-areas: "side-bar main-page";
+  height: 100%;
+  gap: 2rem;
+}
+
+side-bar {
+  grid-area: side-bar;
+}
+
+main-page {
+  grid-area: main-page;
+}
