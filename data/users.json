@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "admin",
+    "fullname": "admin",
+    "type": "Admin",
+    "notifications": [],
+    "events": []
+  },
+  {
+    "id": 2,
+    "username": "Laine",
+    "password": "123",
+    "fullname": "Laine Segundo Gamer",
+    "type": "Normal",
+    "notifications": [],
+    "events": []
+  }
+]
