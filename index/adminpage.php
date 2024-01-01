@@ -72,7 +72,7 @@ include("sessionAPI.php"); ?>
     }
 
     if (isset($_POST["admin"]) && $_POST[""] == "") {
-      if ($_SESSION["type"] === "Normal") {
+      if ($_SESSION["type"] === "Normal" || $_SESSION["type"] === "Organizer") {
         echo "<script>location.replace('adminrequest.php')</script>";
       } else {
         echo "<script>location.replace('adminpage.php')</script>";
@@ -95,55 +95,94 @@ include("sessionAPI.php"); ?>
         <events class="w-full h-full">
           <span class="w-full h-[8rem] text-xl font-bold text-white">List of events</span>
           <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
-            <div class="w-full h-12 flex flex-col">
+            <!-- <div class="w-full h-12 flex flex-col">
               <div class="w-full h-12 bg-white flex items-center justify-start">
                 <div class="h-full w-6 bg-green-700 hover:bg-red-700"></div>
                 <span class="ml-3">Christmas Party</span>
                 <div class="w-full h-full flex justify-end items-center">
-                  <button class="h-full w-16 hover:text-red-600">
-                    remove
-                  </button>
+                  <form method="post">
+                    <input type="hidden" name="postID" value="">
+                    <button name = "delete" class="h-full w-16 hover:text-red-600">
+                      remove
+                    </button>
+                  </form>
                 </div>
               </div>
-            </div>
+            </div> -->
+            <?php echo getPostList();
+
+            if (isset($_POST["delete"])) {
+              deletePost();
+            }
+
+            ?>
           </div>
         </events>
         <organizer>
           <span class="w-full h-[8rem] text-xl font-bold text-white">Admin requests</span>
           <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
-            <div class="w-full h-12 flex flex-col">
+            <!-- <div class="w-full h-12 flex flex-col">
               <div class="w-full h-12 bg-white flex items-center justify-start">
                 <div class="h-full w-6 bg-green-700 hover:bg-red-700"></div>
                 <span class="ml-3 w-96">Charles Darwin</span>
-                <div class="w-full h-full flex justify-end items-center">
-                  <button class="h-full w-16 hover:text-blue-600">
+                <form method="post" class="w-full h-full flex justify-end items-center">
+                  <button name="accept" class="h-full w-16 hover:text-blue-600">
                     accept
                   </button>
-                  <button class="h-full w-16 hover:text-red-600">
+                  <button name="decline" class="h-full w-16 hover:text-red-600">
                     decline
                   </button>
-                </div>
+                </form>
               </div>
-            </div>
+            </div> -->
+            <?php echo getAdminRequests();
+
+            if (isset($_POST["accept"])) {
+              acceptAdminRequest();
+              removeAdminRequest();
+            }
+
+            if (isset($_POST["decline"])) {
+              removeAdminRequest();
+              echo "<script>alert('Successfully Declined!')</script>";
+            }
+
+            ?>
           </div>
         </organizer>
         <admin>
           <span class="w-full h-[8rem] text-xl font-bold text-white">Organizer requests</span>
           <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
-            <div class="w-full h-12 flex flex-col">
+            <!-- <div class="w-full h-12 flex flex-col">
               <div class="w-full h-12 bg-white flex items-center justify-start">
                 <div class="h-full w-6 bg-green-700 hover:bg-red-700"></div>
                 <span class="ml-3 w-96">Charles Darwin</span>
-                <div class="w-full h-full flex justify-end items-center">
-                  <button class="h-full w-16 hover:text-blue-600">
+                <form method="post" class="w-full h-full flex justify-end items-center">
+                  <button name="accept" class="h-full w-16 hover:text-blue-600">
                     accept
                   </button>
-                  <button class="h-full w-16 hover:text-red-600">
+                  <button name="decline" class="h-full w-16 hover:text-red-600">
                     decline
                   </button>
-                </div>
+                </form>
               </div>
-            </div>
+            </div> -->
+            <?php echo getOrganizerRequests();
+
+            if (isset($_POST["organizer-accept"])) {
+              acceptOrganizerRequest();
+              removeOrganizerRequest();
+            }
+
+            if (isset($_POST["organizer-decline"])) {
+              removeOrganizerRequest();
+              echo "<script>alert('Successfully Declined!')</script>";
+            }
+
+
+            ?>
+
+
           </div>
         </admin>
       </div>

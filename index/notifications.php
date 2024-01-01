@@ -71,7 +71,7 @@ include("sessionAPI.php"); ?>
     }
 
     if (isset($_POST["admin"]) && $_POST[""] == "") {
-      if ($_SESSION["type"] === "Normal") {
+      if ($_SESSION["type"] === "Normal" || $_SESSION["type"] === "Organizer") {
         echo "<script>location.replace('adminrequest.php')</script>";
       } else {
         echo "<script>location.replace('adminpage.php')</script>";
@@ -90,12 +90,37 @@ include("sessionAPI.php"); ?>
       class="bg-gray-700 flex gap-5 justify-start items-center p-10 pr-20 h-full flex-col w-full overflow-scroll">
       <span class="w-full h-[8rem] text-9xl font-bold text-white">Notifications</span>
       <!-- START OF POSTS -->
-      <div class="w-full h-12 flex flex-col">
+      <!-- <div class="w-full h-12 flex flex-col">
         <div class="w-full h-12 bg-white flex items-center justify-start">
-          <div class="h-full w-6 bg-green-700"></div>
-          <span class="ml-3">Event cancelled</span>
+
+          <span class="ml-3 w-1/2"><i class="fa-solid fa-person-circle-question"></i> Name requested to <span
+              class="font-bold"> JOIN </span> for Event
+            Name</span>
+          <form method="post" class="flex gap-5 justify-end items-end w-1/2 h-full mr-3">
+            <input type="hidden" value="" name="">
+            <button type="submit" name="start" class="h-full w-fit hover:text-blue-600">
+              Accept
+            </button>
+            <button type="submit" name="cancel" class="h-full w-fit hover:text-red-600">
+              Decline
+            </button>
+          </form>
         </div>
-      </div>
+
+      </div> -->
+      <?php
+      echo getNotifications();
+
+      if (isset($_POST["start"])) {
+        acceptNotification();
+      }
+
+      if (isset($_POST["cancel"])) {
+        deleteNotification();
+      }
+      ?>
+
+
 
       <!-- END OF POSTS -->
     </main-page>

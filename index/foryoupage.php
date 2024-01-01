@@ -1,5 +1,6 @@
 <?php
-include("sessionAPI.php"); ?>
+include("sessionAPI.php");
+include("api.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,6 +14,9 @@ include("sessionAPI.php"); ?>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -70,7 +74,7 @@ include("sessionAPI.php"); ?>
     }
 
     if (isset($_POST["admin"]) && $_POST[""] == "") {
-      if ($_SESSION["type"] === "Normal") {
+      if ($_SESSION["type"] === "Normal" || $_SESSION["type"] === "Organizer") {
         echo "<script>location.replace('adminrequest.php')</script>";
       } else {
         echo "<script>location.replace('adminpage.php')</script>";
@@ -88,48 +92,25 @@ include("sessionAPI.php"); ?>
     <main-page
       class="bg-gray-700 flex gap-5 justify-center items-start p-10 pr-20 flex-wrap h-full w-full overflow-scroll">
       <span class="w-full h-[8rem] text-9xl font-bold text-white">What's new?</span>
-      <!-- START OF POSTS -->
-      <!-- <div
-          class="w-[49%] h-[32rem] bg-white flex flex-col justify-start items-center rounded-3xl"
-        >
-          <div
-            class="w-full h-[50%] bg-gradient-to-t bg-cyan-600 rounded-t-3xl"
-          ></div>
-          <div class="p-5 w-full h-fit">
-            <span class="text-xl font-bold mt-2">EVENT NAME</span><br />
-            <span class="text-xl mt-2 font-bold text-blue-500"
-              >DECEMBER 16, 2023</span
-            >
-            <span class="text-xl mt-2 w-full inline-block h-fit"
-              >event description event description event description event
-              description event description event description</span
-            >
-          </div>
-          <button class="w-full h-16 bg-cyan-500">Register now!</button>
-        </div>
 
-        <div
-          class="w-[49%] h-[32rem] bg-white flex flex-col justify-start items-center rounded-3xl"
-        >
-          <div
-            class="w-full h-[50%] bg-gradient-to-t bg-cyan-600 rounded-t-3xl"
-          ></div>
-          <div class="p-5 w-full h-fit">
-            <span class="text-xl font-bold mt-2">EVENT NAME</span><br />
-            <span class="text-xl mt-2 font-bold text-blue-500"
-              >DECEMBER 16, 2023</span
-            >
-            <span class="text-xl mt-2 w-full inline-block h-fit"
-              >event description event description event description event
-              description event description event description</span
-            >
-          </div>
-          <button class="w-full h-16 bg-cyan-500">Register now!</button>
-        </div> -->
+      <!-- START OF POSTS -->
+      <?php
+      echo getPosts();
+
+      if (isset($_POST["register"])) {
+        echo requestJoin();
+      }
+      ?>
+
+
 
       <!-- END OF POSTS -->
+
     </main-page>
   </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 </body>
 
 </html>

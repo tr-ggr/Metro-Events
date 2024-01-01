@@ -1,5 +1,6 @@
 <?php
-include("sessionAPI.php"); ?>
+include("sessionAPI.php");
+include("api.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -73,7 +74,7 @@ include("sessionAPI.php"); ?>
     }
 
     if (isset($_POST["admin"]) && $_POST[""] == "") {
-      if ($_SESSION["type"] === "Normal") {
+      if ($_SESSION["type"] === "Normal" || $_SESSION["type"] === "Organizer") {
         echo "<script>location.replace('adminrequest.php')</script>";
       } else {
         echo "<script>location.replace('adminpage.php')</script>";
@@ -94,24 +95,49 @@ include("sessionAPI.php"); ?>
 
       <div class="w-full h-fit rounded-2xl bg-slate-600 p-16">
         <form method="post">
-          <label for="username" class="text-white">Event Name</label>
+          <label for="name" class="text-white">Event Name</label>
 
-          <input type="text" id="username" class="w-full font-bold h-14 p-5 mb-7 bg-slate-600 border-2 text-white" />
+          <input type="text" id="name" name="name"
+            class="w-full font-bold h-14 p-5 mb-7 bg-slate-600 border-2 text-white" />
 
-          <label for="username" class="text-white">Event Description</label>
+          <label for="description" name="location" class="text-white">Location</label>
 
-          <textarea type="text" id="username" class="w-full h-28 p-5 mb-7 bg-slate-600 border-2 text-white"></textarea>
+          <input type="text" id="location" name="location"
+            class="w-full font-bold h-14 p-5 mb-7 bg-slate-600 border-2 text-white" />
 
-          <button class="bg-cyan-500 rounded-2xl w-full h-14 create-btn">
+          <label for="description" name="description" class="text-white">Event Description</label>
+
+          <textarea type="text" id="description" name="description"
+            class="w-full h-28 p-5 mb-7 bg-slate-600 border-2 text-white"></textarea>
+
+          <label for="number" class="text-white">Maximum Attendees</label>
+
+          <input type="number" id="people" name="people"
+            class="w-full font-bold h-14 p-5 mb-7 bg-slate-600 border-2 text-white" />
+
+          <label for="date" class="text-white">Date</label>
+
+          <input type="date" id="date" name="date"
+            class="w-full font-bold h-14 p-5 mb-7 bg-slate-600 border-2 text-white" />
+
+          <button name="post" type="submit" class="bg-cyan-500 rounded-2xl w-full h-14">
             <i class="fa-solid fa-plus"></i>
             Create Event
           </button>
-
-          <button type="submit" class="bg-red-400 rounded-2xl w-full h-14 create-btn">
-            <i class="fa-solid fa-xmark"></i>
-            Cancel
-          </button>
         </form>
+
+        <?php
+        if (isset($_POST["post"])) {
+          // echo '<script>alert(1)</script>';
+          if (($_POST['name']) && $_POST['description']) {
+            echo createPosts();
+          } else {
+            echo '<script>alert("Please input the fields!")</script>';
+          }
+
+        }
+        ?>
+
       </div>
     </main-page>
   </div>

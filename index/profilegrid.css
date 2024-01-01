@@ -1,0 +1,18 @@
+.container {
+  display: grid;
+  height: fit-content;
+  width: 100%;
+  grid-template-rows: 32rem;
+  grid-template-columns: 50% 50%;
+  row-gap: 5rem;
+  column-gap: 2rem;
+  grid-template-areas: "organizer admin";
+}
+
+organizer {
+  grid-area: organizer;
+}
+
+admin {
+  grid-area: admin;
+}

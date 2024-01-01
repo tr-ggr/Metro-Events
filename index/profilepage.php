@@ -71,7 +71,7 @@
     }
 
     if (isset($_POST["admin"]) && $_POST[""] == "") {
-      if ($_SESSION["type"] === "Normal") {
+      if ($_SESSION["type"] === "Normal" || $_SESSION["type"] === "Organizer") {
         echo "<script>location.replace('adminrequest.php')</script>";
       } else {
         echo "<script>location.replace('adminpage.php')</script>";
@@ -114,22 +114,48 @@
       <div class=""></div>
       <!-- START OF POSTS -->
       <div class="container">
-        <events class="w-full h-full">
-          <span class="w-full h-[8rem] text-xl font-bold text-white">List of events joined</span>
+        <organizer>
+          <span class="w-full h-[8rem] text-xl font-bold text-white">Events Joined (Waiting)</span>
           <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
+            <!-- <div class="w-full h-12 bg-white flex items-center justify-between">
+                <span class="ml-3 w-fit">Charles Darwin</span>
+                <span class="ml-3 w-fit text-blue-600">Date: December 10 2020</span>
+                <div class="w-fit h-full flex justify-end items-center">
+                  <form method="post">
+                    <input type="hidden" value="" name="postId">
+                    <button type="submit" name="onWaitingCancel" class="h-full w-16 hover:text-red-600">
+                      cancel
+                    </button>
+                  </form>
+                </div>
+              </div> -->
+            <?php
+            echo getWaiting();
+            ?>
+          </div>
+
+        </organizer>
+        <admin>
+          <span class="w-full h-[8rem] text-xl font-bold text-white">Events Joined (Ongoing)</span>
+          <!-- <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
             <div class="w-full h-12 flex flex-col">
-              <div class="w-full h-12 bg-white flex items-center justify-start">
-                <div class="h-full w-6 bg-green-700 hover:bg-red-700"></div>
-                <span class="ml-3 w-fit">Christmas Party akjsdkd</span>
-                <div class="w-full h-full flex justify-end items-center">
-                  <button class="h-full w-16 hover:text-blue-600">
-                    cancel
-                  </button>
+              <div class="w-full h-12 bg-white flex items-center justify-between">
+                <span class="ml-3 w-fit">Charles Darwin</span>
+                <div class="w-fit h-full flex justify-end items-center">
+                  <form method="post">
+                    <input type="hidden" value="" name="postId">
+                    <button type="submit" name="onGoingCancel" class="h-full w-16 hover:text-red-600">
+                      cancel
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
-          </div>
-        </events>
+          </div> -->
+          <?php
+          echo getOngoing();
+          ?>
+        </admin>
       </div>
       <!-- END OF POSTS -->
     </main-page>

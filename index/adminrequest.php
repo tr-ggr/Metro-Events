@@ -71,7 +71,7 @@ include("sessionAPI.php"); ?>
     }
 
     if (isset($_POST["admin"]) && $_POST[""] == "") {
-      if ($_SESSION["type"] === "Normal") {
+      if ($_SESSION["type"] === "Normal" || $_SESSION["type"] === "Organizer") {
         echo "<script>location.replace('adminrequest.php')</script>";
       } else {
         echo "<script>location.replace('adminpage.php')</script>";
@@ -92,11 +92,18 @@ include("sessionAPI.php"); ?>
       <!-- START OF POSTS -->
       <div class="w-full h-96 rounded-3xl flex flex-col justify-center items-center gap-1">
         <span class="text-white text-2xl">Not an admin yet...</span>
-        <button type="submit" class="w-64 h-10 text-white rounded-xl bg-green-600">
-          Click here to apply
-        </button>
+        <form method="post">
+          <button type="submit" name="submit" class="w-64 h-10 text-white rounded-xl bg-green-600">
+            Click here to apply
+          </button>
+        </form>
       </div>
       <!-- END OF POSTS -->
+      <?php
+      if (isset($_POST["submit"])) {
+        applyAdmin();
+      }
+      ?>
     </main-page>
   </div>
 </body>

@@ -11,7 +11,7 @@ include("sessionAPI.php"); ?>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="main.css" />
   <link rel="stylesheet" href="fypgrid.css" />
-  <link rel="stylesheet" href="profilegrid.css" />
+  <link rel="stylesheet" href="admingrid.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -74,7 +74,7 @@ include("sessionAPI.php"); ?>
     }
 
     if (isset($_POST["admin"]) && $_POST[""] == "") {
-      if ($_SESSION["type"] === "Normal") {
+      if ($_SESSION["type"] === "Normal" || $_SESSION["type"] === "Organizer") {
         echo "<script>location.replace('adminrequest.php')</script>";
       } else {
         echo "<script>location.replace('adminpage.php')</script>";
@@ -101,23 +101,69 @@ include("sessionAPI.php"); ?>
       <div class="container">
         <events class="w-full h-full">
           <span class="w-full h-[8rem] text-xl font-bold text-white">Events made</span>
-          <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
-            <div class="w-full h-12 flex flex-col">
-              <div class="w-full h-12 bg-white flex items-center justify-start">
-                <div class="h-full w-6 bg-green-700 hover:bg-red-700"></div>
+          <div class="w-full h-full flex-col  flex gap-2 overflow-scroll">
+            <!-- <div class="w-full h-12 flex flex-col">
+              <div class="w-full h-12 bg-white flex items-center justify-between">
                 <span class="ml-3 w-fit">Christmas Party akjsdkd</span>
-                <div class="w-full h-full flex justify-end items-center">
-                  <button class="h-full w-16 hover:text-blue-600">
+                <span class="ml-3 w-fit text-blue-600">Date: December 10 2020</span>
+                <span class="text-xl mt-2 w-fit flex items-center font-bold text-blue-500"><i
+                    class="fa-solid fa-person"></i>: 0 /
+                  10</span>
+                <div class="w-fit h-full flex gap-5 justify-self-end items-center">
+                  <button class="h-full w-fit hover:text-blue-600">
                     start event!
                   </button>
-                  <button class="h-full w-16 hover:text-red-600">
+                  <button class="h-full w-fit hover:text-red-600">
                     cancel event
                   </button>
                 </div>
               </div>
-            </div>
+            </div> -->
+            <?php
+            echo getEventsMade();
+            ?>
           </div>
+
         </events>
+        <organizer>
+          <span class="w-full h-[8rem] text-xl font-bold text-white">Events Joined (Waiting)</span>
+          <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
+            <!-- <div class="w-full h-12 flex flex-col">
+              <div class="w-full h-12 bg-white flex items-center justify-between">
+                <span class="ml-3 w-fit">Charles Darwin</span>
+                <span class="ml-3 w-fit text-blue-600">Date: December 10 2020</span>
+                <div class="w-fit h-full flex justify-end items-center">
+                  <button class="h-full w-16 hover:text-red-600">
+                    cancel
+                  </button>
+                </div>
+              </div>
+            </div> -->
+            <?php
+            echo getWaiting();
+            ?>
+          </div>
+
+        </organizer>
+        <admin>
+          <span class="w-full h-[8rem] text-xl font-bold text-white">Events Joined (Ongoing)</span>
+          <div class="w-full h-full flex-col flex gap-2 overflow-scroll">
+            <!-- <div class="w-full h-12 flex flex-col">
+              <div class="w-full h-12 bg-white flex items-center justify-between">
+                <span class="ml-3 w-fit">Charles Darwin</span>
+                <div class="w-fit h-full flex justify-end items-center">
+                  <button class="h-full w-16 hover:text-red-600">
+                    cancel
+                  </button>
+                </div>
+              </div>
+            </div> -->
+            <?php
+            echo getOngoing();
+            ?>
+          </div>
+
+        </admin>
       </div>
       <!-- END OF POSTS -->
     </main-page>
