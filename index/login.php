@@ -30,7 +30,7 @@ include("sessionAPI.php");
     </form>
     <?php
     if (isset($_POST["login"])) {
-      echo getSession();
+      getSession();
     }
 
     ?>

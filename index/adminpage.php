@@ -143,6 +143,7 @@ include("sessionAPI.php"); ?>
             }
 
             if (isset($_POST["decline"])) {
+              giveApplicationNotification("Declined");
               removeAdminRequest();
               echo "<script>alert('Successfully Declined!')</script>";
             }
@@ -175,6 +176,7 @@ include("sessionAPI.php"); ?>
             }
 
             if (isset($_POST["organizer-decline"])) {
+              giveApplicationNotification("Declined");
               removeOrganizerRequest();
               echo "<script>alert('Successfully Declined!')</script>";
             }

@@ -1,5 +1,5 @@
 <?php
-include("sessionAPI.php");
+
 include("api.php"); ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,5 +1,5 @@
 <?php
-
+include("sessionAPI.php");
 
 // users JSON
 $usersJSON = '../data/users.json';
@@ -36,8 +36,12 @@ function createPosts()
 {
   $data = file_get_contents('../data/posts.json');
   $posts = json_decode($data, true);
-  $end = end($posts);
-  $new_Id = (int) $end["postId"] + 1;
+  if (count($posts) == 0) {
+    $new_Id = 1;
+  } else {
+    $end = end($posts);
+    $new_Id = (int) $end["postId"] + 1;
+  }
 
   $author = $_SESSION;
 
@@ -55,7 +59,7 @@ function createPosts()
     'max_people' => $_POST["people"],
     "status" => "Waiting",
     "reviews" => [],
-    "votes" => 0,
+    "votes" => [],
     "location" => $_POST["location"]
   );
 
@@ -64,6 +68,79 @@ function createPosts()
   $jsonData = json_encode($tempArray);
 
   file_put_contents('../data/posts.json', $jsonData);
+}
+
+
+
+function getReplies($postId)
+{
+  $posts_data = file_get_contents('../data/posts.json');
+  $posts = json_decode($posts_data, true);
+
+  $str = '';
+
+  foreach ($posts as $post) {
+    if ($post['postId'] == $postId) {
+      $i = 0;
+
+      foreach ($post["reviews"] as $reviews) {
+        $userDetails = getUserIdData($reviews["userId"]);
+        if ($reviews["userId"] == $_SESSION["id"]) {
+          $str .= '<div class="w-full h-fit flex gap-3 border-l-4 p-4 border-blue-500">
+          <i class="fa-solid fa-circle-user text-white text-2xl"></i>
+          <div class="flex flex-col w-fit h-fit">
+            <span class="text-white">' . $userDetails["fullname"] . ' | ' . $reviews["date"]["date"] . '</span>
+            <span class="text-white">' . $reviews["message"] . '
+            </span>
+            <form method="post">
+            <input type = "hidden" value = "' . $postId . '" name = "postId">
+
+              <input type = "hidden" value = "' . $i . '" name = "reviewId">
+              <button type="submit" name = "delete" class="bg-red-500 mt-2 p-2 rounded-xl text-white">Delete</button>
+            </form>
+          </div>
+        </div>';
+        } else {
+          $str .= '
+          <div class="w-full h-fit flex gap-3 p-4 ">
+            <i class="fa-solid fa-circle-user text-white text-2xl"></i>
+            <div class="flex flex-col w-fit h-fit">
+              <span class="text-white">' . $userDetails["fullname"] . ' | ' . $reviews["date"]["date"] . '</span>
+              <span class="text-white">' . $reviews["message"] . '
+              </span>
+            </div>
+          </div>';
+        }
+
+        $i++;
+      }
+    }
+  }
+  return $str;
+}
+function countVotes($postId)
+{
+  $posts_data = file_get_contents('../data/posts.json');
+  $posts = json_decode($posts_data, true);
+
+  $sum = 0;
+
+
+  foreach ($posts as &$post) {
+    if ($post['postId'] == $postId) {
+      foreach ($post["votes"] as &$review) {
+        if ($review["type"] == "up") {
+          $sum++;
+        }
+
+        if ($review["type"] == "down") {
+          $sum--;
+        }
+      }
+    }
+  }
+
+  return $sum;
 }
 
 function getPosts()
@@ -79,11 +156,13 @@ function getPosts()
     if ($_SESSION['id'] == $post['author']["id"] || $post['status'] !== "Waiting")
       continue;
     $str .= '<div class="w-[49%] min-h-96 max-h-fit bg-slate-300 flex gap-7 ">
-        <div class="w-[5%] min-h-full bg-slate-900 flex flex-col items-center p-2 ">
-          <button><i class="fa-solid fa-thumbs-up text-2xl text-white"></i></button>
-          <span class="text-2xl text-green-500">' . $post["votes"] . '</span>
-          <button><i class="fa-solid fa-thumbs-down text-2xl text-white"></i></button>
-        </div>
+        <form method = "post" class="w-[5%] min-h-full bg-slate-900 flex flex-col items-center p-2 ">
+        <input type = "hidden" value = "' . $post["postId"] . '" name = "postId">
+          <button type = "submit" name = "upvote"><i class="fa-solid fa-thumbs-up text-2xl text-white"></i></button>
+          <span class="text-2xl text-green-500">' . countVotes($post["postId"]) . '</span>
+          <button type = "submit" name = "downvote"><i class="fa-solid fa-thumbs-down text-2xl text-white"></i></button>
+          </form>
+
         <div class="flex flex-col w-[95%] min-h-full p-2 justify-between gap-5">
           <div class="flex flex-col w-full h-fit">
             <span class="text-7xl font-bold mt-2">' . $post["name"] . '</span><br>
@@ -133,68 +212,15 @@ function getPosts()
                 <div class="flex gap-3 flex-col p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
                   <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                     Reviews
-                  </h3>
-
-
-
-                  <div class="w-full h-fit flex gap-3 p-4 ">
-                    <i class="fa-solid fa-circle-user text-white text-2xl"></i>
-                    <div class="flex flex-col w-fit h-fit">
-                      <span class="text-white">author | date</span>
-                      <span class="text-white">asjndjoasndasd ojasndo jasn djoasn n dasnddn joasndasnjod nasjod njoas
-                        dnoj/div>asojnd ioasjd hoias
-                        asojdh uaso dhuash sjndjoasndasd ojasndo jasn djoasn n dasnddn joasndasnjod nasjod njoas
-                        dnoj/div>asojnd ioasjd hoias
-                        asojdh uaso dhuash
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="w-full h-fit flex gap-3 border-l-4 p-4 border-blue-500">
-                    <i class="fa-solid fa-circle-user text-white text-2xl"></i>
-                    <div class="flex flex-col w-fit h-fit">
-                      <span class="text-white">author | date</span>
-                      <span class="text-white">asjndjoasndasd ojasndo jasn djoasn n dasnddn joasndasnjod nasjod njoas
-                        dnoj/div>asojnd ioasjd hoias
-                        asojdh uaso dhuash sjndjoasndasd ojasndo jasn djoasn n dasnddn joasndasnjod nasjod njoas
-                        dnoj/div>asojnd ioasjd hoias
-                        asojdh uaso dhuash
-                      </span>
-                      <form method="post">
-                        <button type="submit" class="bg-red-500 mt-2 p-2 rounded-xl text-white">Delete</button>
-                      </form>
-                    </div>
-                  </div>
-
-                  <form>
+                  </h3>' . getReplies($post["postId"]) . '<form method = "post">
+                  <input type="hidden" name="postID" value=' . $post["postId"] . '>
                     <label for=" chat" class="sr-only">Your message</label>
                     <div class="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
-                      <button type="button"
-                        class="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                          viewBox="0 0 20 18">
-                          <path fill="currentColor"
-                            d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z" />
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18 1H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z" />
-                        </svg>
-                        <span class="sr-only">Upload image</span>
-                      </button>
-                      <button type="button"
-                        class="p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                          viewBox="0 0 20 20">
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13.408 7.5h.01m-6.876 0h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM4.6 11a5.5 5.5 0 0 0 10.81 0H4.6Z" />
-                        </svg>
-                        <span class="sr-only">Add emoji</span>
-                      </button>
-                      <textarea id="chat" rows="1"
+
+                      <textarea id="chat" rows="1" name="message"
                         class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Your message..."></textarea>
-                      <button type="submit"
+                      <button type="submit" name = "send"
                         class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600">
                         <svg class="w-5 h-5 rotate-90 rtl:-rotate-90" aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">

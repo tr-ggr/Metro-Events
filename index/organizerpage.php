@@ -121,6 +121,14 @@ include("sessionAPI.php"); ?>
             </div> -->
             <?php
             echo getEventsMade();
+
+            if (isset($_POST["start"])) {
+              startEvent();
+            }
+
+            if (isset($_POST["cancel"])) {
+              deletePost();
+            }
             ?>
           </div>
 
@@ -141,6 +149,10 @@ include("sessionAPI.php"); ?>
             </div> -->
             <?php
             echo getWaiting();
+
+            if (isset($_POST["onWaitingCancel"])) {
+              deleteUserPost();
+            }
             ?>
           </div>
 
@@ -160,6 +172,11 @@ include("sessionAPI.php"); ?>
             </div> -->
             <?php
             echo getOngoing();
+
+            if (isset($_POST["onGoingCancel"])) {
+              deleteUserPost();
+              echo "<script>alert(1)</script>";
+            }
             ?>
           </div>
 

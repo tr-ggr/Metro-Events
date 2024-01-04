@@ -1,5 +1,4 @@
 <?php
-include("sessionAPI.php");
 include("api.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,8 +96,24 @@ include("api.php"); ?>
       <?php
       echo getPosts();
 
+      if (isset($_POST["upvote"])) {
+        upvotePost();
+      }
+
+      if (isset($_POST["downvote"])) {
+        downvotePost();
+      }
+
       if (isset($_POST["register"])) {
-        echo requestJoin();
+        requestJoin();
+      }
+
+      if (isset($_POST["send"])) {
+        sendMessage();
+      }
+
+      if (isset($_POST["delete"])) {
+        deleteMessage();
       }
       ?>
 

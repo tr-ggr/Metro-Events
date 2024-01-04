@@ -67,8 +67,13 @@ function requestJoin()
 
   foreach ($users as &$user) {
     if ($user["id"] == $postAuthor) {
-      $end = end($user["notifications"]);
-      $new_Id = (int) $end["postId"] + 1;
+      if (count($user["notifications"]) == 0) {
+        $new_Id = 1;
+      } else {
+        $end = end($user["notifications"]);
+        $new_Id = (int) $end["postId"] + 1;
+      }
+
 
       $extra = array(
         "notificationId" => $new_Id,
@@ -198,18 +203,20 @@ function getOngoing()
   foreach ($decode as $item) {
     if ($_SESSION["id"] == $item["id"]) {
       foreach ($item["events"] as $event) {
-        if ($event["status"] === "Waiting")
+        $postDetails = getpostIdData($event["postId"]);
+        if ($postDetails["status"] === "Waiting")
           continue;
 
         $str .= '<div class="w-full h-12 flex flex-col">
           <div class="w-full h-12 bg-white flex items-center justify-between">
-            <span class="ml-3 w-fit">' . $event["name"] . '</span>
+            <span class="ml-3 w-fit">' . $postDetails["name"] . '</span>
             <div class="w-fit h-full flex justify-end items-center">
             <form method="post">
-            <input type="hidden" value="' . $event["postId"] . '" name="postId">
+            <input type="hidden" value="' . $postDetails["postId"] . '" name="postId">
             <button type="submit" name="onGoingCancel" class="h-full w-16 hover:text-red-600">
               cancel
             </button>
+            </form>
             </div>
           </div>
         </div>';
@@ -268,6 +275,66 @@ function getNotifications()
           </div>
     
         </div>';
+        } else if ($notif["type"] === "Canceled") {
+          $str .= '<div class="w-full h-12 flex flex-col">
+          <div class="w-full h-12 bg-white flex items-center justify-start">
+    
+            <span class="ml-3 w-1/2"><i class="fa-regular fa-circle-xmark"></i><span class = "text-blue-900 italic underline"> ' . $postDetails["name"] . '</span> has been <span
+                class="font-bold"> CANCELED </span></span>
+            <form method="post" class="flex gap-5 justify-end items-end w-1/2 h-full mr-3">
+            <input type="hidden" value="' . $notif["notificationId"] . '" name="notificationID">
+              <button type="submit" name="cancel" class="h-full w-fit hover:text-red-600">
+                Close
+              </button>
+            </form>
+          </div>
+    
+        </div>';
+        } else if ($notif["type"] === "Accepted") {
+          $str .= '<div class="w-full h-12 flex flex-col">
+          <div class="w-full h-12 bg-white flex items-center justify-start">
+    
+            <span class="ml-3 w-1/2"><i class="fa-solid fa-circle-check"></i></i>Your application has been <span
+                class="font-bold"> ACCEPTED! </span></span>
+            <form method="post" class="flex gap-5 justify-end items-end w-1/2 h-full mr-3">
+            <input type="hidden" value="' . $notif["notificationId"] . '" name="notificationID">
+              <button type="submit" name="cancel" class="h-full w-fit hover:text-red-600">
+                Close
+              </button>
+            </form>
+          </div>
+    
+        </div>';
+        } else if ($notif["type"] === "Started") {
+          $str .= '<div class="w-full h-12 flex flex-col">
+          <div class="w-full h-12 bg-white flex items-center justify-start">
+    
+            <span class="ml-3 w-1/2"><i class="fa-solid fa-circle-check"></i><span class = "text-blue-900 italic underline"> ' . $postDetails["name"] . '</span> has <span
+                class="font-bold"> STARTED </span></span>
+            <form method="post" class="flex gap-5 justify-end items-end w-1/2 h-full mr-3">
+            <input type="hidden" value="' . $notif["notificationId"] . '" name="notificationID">
+              <button type="submit" name="cancel" class="h-full w-fit hover:text-red-600">
+                Close
+              </button>
+            </form>
+          </div>
+    
+        </div>';
+        } else {
+          $str .= '<div class="w-full h-12 flex flex-col">
+          <div class="w-full h-12 bg-white flex items-center justify-start">
+    
+            <span class="ml-3 w-1/2"><i class="fa-regular fa-circle-xmark"></i>Your application has been <span
+                class="font-bold"> DECLINED! </span></span>
+            <form method="post" class="flex gap-5 justify-end items-end w-1/2 h-full mr-3">
+            <input type="hidden" value="' . $notif["notificationId"] . '" name="notificationID">
+              <button type="submit" name="cancel" class="h-full w-fit hover:text-red-600">
+                Close
+              </button>
+            </form>
+          </div>
+    
+        </div>';
         }
       }
 
@@ -300,33 +367,31 @@ function deleteNotification()
           if (count($notif) == 1) {
             $item["notifications"] = [];
           } else {
-            unset($item["notifications"][$i]);
-
-
-            $i = 1;
-            foreach ($item["notifications"] as &$notif) {
-              $notif["notificationId"] = $i;
-              $i++;
-            }
-
+            array_splice($item["notifications"], $i, 1);
           }
 
 
+          $i = 1;
+          foreach ($item["notifications"] as &$notif) {
+            $notif["notificationId"] = $i;
+            $i++;
+          }
 
-
-          $jsonData = json_encode($decode, JSON_PRETTY_PRINT);
-          file_put_contents('../data/users.json', $jsonData);
-          unset($item);
-          echo "<script>alert('Successfully Declined!')</script>";
         }
-        $i++;
+
+
+        $jsonData = json_encode($decode, JSON_PRETTY_PRINT);
+        file_put_contents('../data/users.json', $jsonData);
+        unset($item);
+
       }
+      $i++;
     }
   }
-
   echo "<script>location.reload()</script>";
-
 }
+
+
 function getWaiting()
 {
   $data = file_get_contents('../data/users.json');
@@ -337,15 +402,16 @@ function getWaiting()
   foreach ($decode as $item) {
     if ($_SESSION["id"] == $item["id"]) {
       foreach ($item["events"] as $event) {
-        if ($event["status"] !== "Waiting")
+        $postDetails = getpostIdData($event["postId"]);
+        if ($postDetails["status"] !== "Waiting")
           continue;
 
         $str .= '
           <div class="w-full h-12 bg-white flex items-center justify-between">
-            <span class="ml-3 w-1/3">' . $event["name"] . '</span>
-            <span class="ml-3 w-1/3 text-blue-600">Date: ' . $event["date"] . '</span>
+            <span class="ml-3 w-1/3">' . $postDetails["name"] . '</span>
+            <span class="ml-3 w-1/3 text-blue-600">Date: ' . $postDetails["date"] . '</span>
             <form method="post" class="w-fit h-full flex justify-end items-center">
-            <input type="hidden" value="' . $event["postId"] . '" name="postId">
+            <input type="hidden" value="' . $postDetails["postId"] . '" name="postId">
             <button type="submit" name="onWaitingCancel" class="h-full w-16 hover:text-red-600">
               cancel
             </button>
@@ -450,10 +516,44 @@ function getPostList()
   return $str;
 }
 
+function deleteUserPost()
+{
+  $user_data = file_get_contents('../data/users.json');
+  $users = json_decode($user_data, true);
+
+  foreach ($users as &$user) {
+    $i = 0;
+    if ($user["id"] == $_SESSION["id"]) {
+      foreach ($user["events"] as $event) {
+        if ($event["postId"] == $_POST["postId"]) {
+          if (count($user["events"]) == 1) {
+            $user["events"] = [];
+          } else {
+            array_splice($user["events"], $i, 1);
+          }
+        }
+        $i++;
+      }
+
+      $_SESSION = $user;
+    }
+
+  }
+
+  unset($user);
+  $userData = json_encode($users);
+  file_put_contents('../data/users.json', $userData);
+}
+
+
+
 function deletePost()
 {
   $data = file_get_contents('../data/posts.json');
   $decode = json_decode($data, true);
+
+  $user_data = file_get_contents('../data/users.json');
+  $users = json_decode($user_data, true);
 
   $i = 0;
 
@@ -466,6 +566,28 @@ function deletePost()
         $post["postId"] = $i;
         $i++;
       }
+
+      givePostNotification("Canceled");
+
+
+      foreach ($users as &$user) {
+        $i = 0;
+        foreach ($user["events"] as $event) {
+          if ($event["postId"] == $_POST["postID"]) {
+            if (count($user["events"]) == 1) {
+              $user["events"] = [];
+            } else {
+              array_splice($user["events"], $i, 1);
+            }
+
+
+          }
+          $i++;
+        }
+      }
+
+      $userData = json_encode($users);
+      file_put_contents('../data/users.json', $userData);
 
 
       $postData = json_encode($decode);
@@ -557,6 +679,7 @@ function getAdminRequests()
 
 function acceptAdminRequest()
 {
+  giveApplicationNotification("Accepted");
   $user_data = file_get_contents('../data/users.json');
   $users = json_decode($user_data, true);
 
@@ -628,6 +751,7 @@ function getOrganizerRequests()
 
 function acceptOrganizerRequest()
 {
+  giveApplicationNotification("Accepted");
   $user_data = file_get_contents('../data/users.json');
   $users = json_decode($user_data, true);
 
@@ -665,6 +789,233 @@ function removeOrganizerRequest()
     $i++;
   }
 }
+
+function startEvent()
+{
+  givePostNotification("Started");
+  $data = file_get_contents('../data/posts.json');
+  $decode = json_decode($data, true);
+
+  foreach ($decode as &$post) {
+    if ($post["postId"] == $_POST["postID"]) {
+      $post["status"] = "Ongoing!";
+
+      givePostNotification("Started");
+
+      $postData = json_encode($decode);
+      file_put_contents('../data/posts.json', $postData);
+      echo "<script>alert('Successfully Started!')</script>";
+      unset($post);
+
+      return;
+    }
+  }
+}
+
+function givePostNotification($typeOfNotif)
+{
+  $data = file_get_contents('../data/users.json');
+  $users = json_decode($data, true);
+
+  $post_data = file_get_contents('../data/posts.json');
+  $posts = json_decode($post_data, true);
+
+  foreach ($posts as &$post) {
+    foreach ($post["attendees"] as $people) {
+      // print_r($people);
+      foreach ($users as &$user) {
+        // print_r($user);
+        if ($user["id"] === $people["id"]) {
+          if (count($user["notifications"]) == 0) {
+            $new_Id = 1;
+          } else {
+            $end = end($user["notifications"]);
+            $new_Id = (int) $end["postId"] + 1;
+          }
+
+          $extra = array(
+            "notificationId" => $new_Id,
+            'type' => $typeOfNotif,
+            "postId" => $_POST["postID"],
+            "userId" => null
+          );
+
+          array_push($user["notifications"], $extra);
+        }
+      }
+    }
+  }
+
+  $jsonData = json_encode($users);
+  file_put_contents('../data/users.json', $jsonData);
+
+  $posts_jsonData = json_encode($posts);
+  file_put_contents('../data/posts.json', $posts_jsonData);
+
+  unset($user);
+  unset($post);
+}
+
+function giveApplicationNotification($typeOfNotif)
+{
+  $user_data = file_get_contents('../data/users.json');
+  $users = json_decode($user_data, true);
+
+  foreach ($users as &$user) {
+    if ($user["id"] == $_POST["userId"]) {
+      if (count($user["notifications"]) == 0) {
+        $new_Id = 1;
+      } else {
+        $end = end($user["notifications"]);
+        $new_Id = (int) $end["notificationId"] + 1;
+      }
+
+      $extra = array(
+        "notificationId" => $new_Id,
+        'type' => $typeOfNotif,
+        "postId" => null,
+        "userId" => null
+      );
+
+      array_push($user["notifications"], $extra);
+      break;
+    }
+  }
+
+
+  unset($user);
+  $postData = json_encode($users);
+  file_put_contents('../data/users.json', $postData);
+}
+
+function sendMessage()
+{
+  $posts_data = file_get_contents('../data/posts.json');
+  $posts = json_decode($posts_data, true);
+
+  foreach ($posts as &$post) {
+    if ($post['postId'] == $_POST['postID']) {
+
+      $extra = array(
+        'userId' => $_SESSION['id'],
+        'message' => $_POST['message'],
+        "date" => date_create()
+      );
+
+      array_push($post["reviews"], $extra);
+      break;
+    }
+  }
+
+  unset($post);
+  $postData = json_encode($posts);
+  file_put_contents('../data/posts.json', $postData);
+}
+
+function deleteMessage()
+{
+  $posts_data = file_get_contents('../data/posts.json');
+  $posts = json_decode($posts_data, true);
+
+  foreach ($posts as &$post) {
+    if ($post['postId'] == $_POST['postId']) {
+      if (count($post["reviews"]) == 1) {
+        $post["reviews"] = [];
+      } else {
+        array_slice($post["reviews"], $_POST["reviewId"], 1);
+      }
+      break;
+    }
+  }
+
+  echo "<script>alert('Successfully Deleted a comment!')</script>";
+  unset($post);
+  $postData = json_encode($posts);
+  file_put_contents('../data/posts.json', $postData);
+}
+
+function downvotePost()
+{
+  $posts_data = file_get_contents('../data/posts.json');
+  $posts = json_decode($posts_data, true);
+
+  $extra = array(
+    'userId' => $_SESSION['id'],
+    'type' => "down"
+  );
+
+
+
+  foreach ($posts as &$post) {
+    if ($post['postId'] == $_POST['postId']) {
+      foreach ($post["votes"] as &$votes) {
+        if ($votes["userId"] == $_SESSION['id']) {
+          if ($votes["type"] == "down") {
+            echo "<script>alert('Already DOWNVOTED the Post!')</script>";
+            return;
+          }
+
+          if ($votes["type"] == "up") {
+            $votes["type"] = "down";
+            unset($post);
+            $postData = json_encode($posts);
+            file_put_contents('../data/posts.json', $postData);
+            return;
+          }
+
+
+        }
+      }
+
+      array_push($post["votes"], $extra);
+      unset($post);
+      $postData = json_encode($posts);
+      file_put_contents('../data/posts.json', $postData);
+      return;
+    }
+  }
+}
+
+function upvotePost()
+{
+  $posts_data = file_get_contents('../data/posts.json');
+  $posts = json_decode($posts_data, true);
+
+  $extra = array(
+    'userId' => $_SESSION['id'],
+    'type' => "up"
+  );
+
+  foreach ($posts as &$post) {
+    if ($post['postId'] == $_POST['postId']) {
+      foreach ($post["votes"] as &$votes) {
+        if ($votes["userId"] == $_SESSION['id']) {
+          if ($votes["type"] == "up") {
+            echo "<script>alert('Already UPVOTED the Post!')</script>";
+            return;
+          }
+
+          if ($votes["type"] == "down") {
+            $votes["type"] = "up";
+            unset($post);
+            $postData = json_encode($posts);
+            file_put_contents('../data/posts.json', $postData);
+            return;
+          }
+
+
+        }
+      }
+
+      array_push($post["votes"], $extra);
+      unset($post);
+      $postData = json_encode($posts);
+      file_put_contents('../data/posts.json', $postData);
+      return;
+    }
+  }
+}
+
 
 
 

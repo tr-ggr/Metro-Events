@@ -117,6 +117,7 @@ include("sessionAPI.php"); ?>
 
       if (isset($_POST["cancel"])) {
         deleteNotification();
+        echo "<script>alert('Successfully Removed!')</script>";
       }
       ?>
 
